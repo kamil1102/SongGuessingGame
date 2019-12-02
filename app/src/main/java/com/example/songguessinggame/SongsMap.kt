@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 
+
 class SongsMap : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     lateinit var mGoogleMap: GoogleMap
@@ -32,7 +33,13 @@ class SongsMap : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindow
     internal var mFusedLocationClient: FusedLocationProviderClient? = null
     var currentSong : Song = Song()
 
-    internal var mLocationCallback: LocationCallback = object : LocationCallback() {
+
+
+
+    //val location = Location()
+
+     var mLocationCallback: LocationCallback = object : LocationCallback() {
+
 
         override fun onLocationResult(locationResult: LocationResult) {
             val locationList = locationResult.locations
@@ -44,12 +51,13 @@ class SongsMap : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindow
                     "Location: " + location.getLatitude() + " " + location.getLongitude()
                 )
                 mLastLocation = location
+
                 if (mCurrLocationMarker != null) {
                     mCurrLocationMarker?.remove()
                 }
 
                 //Place current location marker
-                val latLng = LatLng(location.latitude, location.longitude)
+                 val latLng = LatLng(location.latitude, location.longitude)
                 // val markerOptions = MarkerOptions()
                 //  markerOptions.position(latLng)
                 //markerOptions.title("Current Position")
@@ -57,9 +65,10 @@ class SongsMap : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindow
                 //mCurrLocationMarker = mGoogleMap.addMarker(markerOptions)
 
                 //move map camera
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 19.0F))
+               // mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 19.0F))
             }
         }
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,15 +102,7 @@ class SongsMap : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindow
         dbHandler = DBHandler(this, null, null, 1)
         val songlist = dbHandler.getSongs(this)
 
-        for (s in songlist){
-            currentSong = s
-            val sydney = LatLng(s.mapLatitude , s.mapLongitude)
-            mGoogleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
-            mGoogleMap.setOnInfoWindowClickListener(this)
 
-
-        }
 
 
 
@@ -118,6 +119,48 @@ class SongsMap : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindow
                     Looper.myLooper()
                 )
                 mGoogleMap.isMyLocationEnabled = true
+
+
+                    mFusedLocationClient?.lastLocation?.addOnCompleteListener(this) { task ->
+                        var location: Location? = task.result
+
+                            var lat = location!!.latitude
+                            var long = location!!.longitude
+
+
+
+                            val lastLoc = LatLng(lat, long)
+
+                        var results = FloatArray(1)
+
+
+                        for (s in songlist){
+
+                            currentSong = s
+                            Location.distanceBetween(location!!.latitude, location!!.longitude,s.mapLatitude,s.mapLongitude,results)
+
+                            val sydney = LatLng(s.mapLatitude , s.mapLongitude)
+                            val marker = mGoogleMap.addMarker(MarkerOptions().position(sydney).title("Collect"))
+                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+
+                            if(results.get(0) > 100) {
+
+
+                            }
+
+                            mGoogleMap.setOnInfoWindowClickListener(this)
+
+
+
+
+                        }
+
+                        //mGoogleMap.addMarker(MarkerOptions().position(lastLoc).title(results.get(0).toString()))
+                        //mGoogleMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(lastLoc, zoomLevel))
+                        }
+
+
             } else {
                 //Request Location Permission
                 checkLocationPermission()
@@ -219,9 +262,15 @@ class SongsMap : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindow
     }
 
     override fun onInfoWindowClick(p0: Marker?) {
-        val myIntent = Intent(baseContext, MusicLibraryActivity::class.java)
-        startActivity(myIntent)
-        dbHandler.updadteSong(currentSong.songID.toString(),1)
-        p0?.remove()
+
+            val myIntent = Intent(baseContext, MusicLibraryActivity::class.java)
+            startActivity(myIntent)
+            dbHandler.updadteSong(currentSong.songID.toString(), 1)
+            p0?.remove()
+
     }
+
+
+
+
 }

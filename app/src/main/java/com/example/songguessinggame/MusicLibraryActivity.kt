@@ -39,8 +39,8 @@ class MusicLibraryActivity : AppCompatActivity() {
         newSong3.songLyric = "Once upon a time you dressed so fine\n" +
                 "You threw the bums a dime in your prime,\n" +
                 "Didn't you?"
-        newSong3.mapLongitude =  -3.876117
-        newSong3.mapLatitude = 51.619343
+        newSong3.mapLongitude =  -7.876117
+        newSong3.mapLatitude = 48.619343
         newSong3.isClassic = 0
         newSong3.isCollected = 0
 
