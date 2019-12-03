@@ -1,6 +1,8 @@
 package com.example.songguessinggame
 
-class Song {
+import java.io.Serializable
+
+class Song : Serializable {
     var songID : Int = 0
     var songTitle : String = ""
     var songArtist : String = ""

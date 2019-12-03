@@ -1,9 +1,13 @@
 package com.example.songguessinggame
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+
+
 
 class MusicLibraryActivity : AppCompatActivity() {
 
@@ -13,6 +17,12 @@ class MusicLibraryActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        assert(
+            supportActionBar != null //null check
+        )
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_music_library)
         dbHandler = DBHandler(this, null, null, 1)
@@ -40,7 +50,7 @@ class MusicLibraryActivity : AppCompatActivity() {
                 "You threw the bums a dime in your prime,\n" +
                 "Didn't you?"
         newSong3.mapLongitude =  -7.876117
-        newSong3.mapLatitude = 48.619343
+        newSong3.mapLatitude = 51.619343
         newSong3.isClassic = 0
         newSong3.isCollected = 0
 
@@ -50,6 +60,10 @@ class MusicLibraryActivity : AppCompatActivity() {
 
         viewSongs()
     }
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
     private fun viewSongs(){
         val songlist = dbHandler.getSongs(this)
         val adapter = SongAdapter(this,songlist)
@@ -57,6 +71,10 @@ class MusicLibraryActivity : AppCompatActivity() {
         rv.layoutManager = LinearLayoutManager(this,
             RecyclerView.AUTOFILL_FLAG_INCLUDE_NOT_IMPORTANT_VIEWS, false) as RecyclerView.LayoutManager
         rv.adapter = adapter
+    }
+    fun onButtonMapClick2(v: View?) {
+        val myIntent = Intent(baseContext, SongsMap::class.java)
+        startActivity(myIntent)
     }
 
 

@@ -26,6 +26,11 @@ class MainActivity : AppCompatActivity() {
         startActivity(myIntent)
     }
 
+    fun onButtonMapClick2(v: View?) {
+        val myIntent = Intent(baseContext, SongsMap::class.java)
+        startActivity(myIntent)
+    }
+
 
 
 }

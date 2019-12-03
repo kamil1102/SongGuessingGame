@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -32,6 +33,7 @@ class SongsMap : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindow
     internal var mCurrLocationMarker: Marker? = null
     internal var mFusedLocationClient: FusedLocationProviderClient? = null
     var currentSong : Song = Song()
+
 
 
 
@@ -65,13 +67,19 @@ class SongsMap : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindow
                 //mCurrLocationMarker = mGoogleMap.addMarker(markerOptions)
 
                 //move map camera
-               // mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 19.0F))
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 17.0F))
+
+
             }
         }
 
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        assert(
+            supportActionBar != null //null check
+        )
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
 
@@ -81,6 +89,8 @@ class SongsMap : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindow
 
         mapFrag = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFrag?.getMapAsync(this)
+
+
     }
 
     public override fun onPause() {
@@ -131,33 +141,27 @@ class SongsMap : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindow
 
                             val lastLoc = LatLng(lat, long)
 
-                        var results = FloatArray(1)
 
 
                         for (s in songlist){
 
                             currentSong = s
-                            Location.distanceBetween(location!!.latitude, location!!.longitude,s.mapLatitude,s.mapLongitude,results)
 
                             val sydney = LatLng(s.mapLatitude , s.mapLongitude)
-                            val marker = mGoogleMap.addMarker(MarkerOptions().position(sydney).title("Collect"))
-                            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+                            
 
 
-                            if(results.get(0) > 100) {
 
-
-                            }
-
+                                mGoogleMap.addMarker(MarkerOptions().position(sydney).title("Collect"))
                             mGoogleMap.setOnInfoWindowClickListener(this)
-
 
 
 
                         }
 
                         //mGoogleMap.addMarker(MarkerOptions().position(lastLoc).title(results.get(0).toString()))
-                        //mGoogleMap!!.animateCamera(CameraUpdateFactory.newLatLngZoom(lastLoc, zoomLevel))
+
                         }
 
 
@@ -263,11 +267,26 @@ class SongsMap : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnInfoWindow
 
     override fun onInfoWindowClick(p0: Marker?) {
 
+        var results = FloatArray(1)
+
+       Location.distanceBetween(mGoogleMap.myLocation.latitude, mGoogleMap.myLocation.longitude,p0!!.position.latitude,p0!!.position.longitude,results)
+
+        if(results.get(0)<300) {
             val myIntent = Intent(baseContext, MusicLibraryActivity::class.java)
             startActivity(myIntent)
             dbHandler.updadteSong(currentSong.songID.toString(), 1)
             p0?.remove()
+        }
 
+
+}
+    override fun onSupportNavigateUp(): Boolean {
+        finish()
+        return true
+    }
+    fun onButtonGoClick(v: View?) {
+        val myIntent = Intent(baseContext, MusicLibraryActivity::class.java)
+        startActivity(myIntent)
     }
 
 
